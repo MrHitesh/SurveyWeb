@@ -110,6 +110,17 @@ namespace SurveyWebApp.Controllers
                 _db.Surveys.Add(FormSurvey);
             }
 
+            var quesToRemove = surveyFromdb.Questions.Except(FormSurvey.Questions);
+
+            foreach (var ques in quesToRemove)
+            {
+                foreach (var choice in ques.Choices)
+                {
+                    _db.Choices.Remove(choice);
+                }
+                _db.Questions.Remove(ques);
+            }
+
             _db.SaveChanges();
 
             var s = _db.Surveys
@@ -119,6 +130,22 @@ namespace SurveyWebApp.Controllers
             return View(s);
         }
 
+        [HttpPost]
+        public IActionResult DeleteQuestion(int id)
+        {
+            var questionToDelete = _db.Questions
+                .Include(a => a.Choices)
+                .FirstOrDefault(x => x.Id == id);
+            foreach (var choice in questionToDelete.Choices)
+            {
+                _db.Choices.Remove(choice);
+            }
+            
+            _db.Questions.Remove(questionToDelete);
+            _db.SaveChanges();
+
+            return Ok();
+        }
         public IActionResult Results()
         {
             return View();
