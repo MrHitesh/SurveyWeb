@@ -16,13 +16,13 @@
             <input type="hidden" asp-for="Id" />
             <div class="form-group">
                 <label asp-for="Title" class="control-label"></label>
-                <input asp-for="Title" class="form-control" />
+                <input id="surveyTitle" asp-for="Title" class="form-control" />
                 <span asp-validation-for="Title" class="text-danger"></span>
 
             </div>
             <div class="form-group">
                 <label asp-for="Description" class="control-label"></label>
-                <input asp-for="Description" class="form-control" />
+                <input id="surveyDescription" asp-for="Description" class="form-control" />
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
 
@@ -46,7 +46,7 @@
                 </div>
                 <div class="form-group">
                     <label asp-for="ExpiresOn" class="control-label"></label>
-                    <input asp-for="ExpiresOn" class="form-control" />
+                    <input id="surveyExpiresOn" asp-for="ExpiresOn" class="form-control" />
                     <span asp-validation-for="ExpiresOn" class="text-danger"></span>
                 </div>
                 <div class="form-group">
@@ -58,11 +58,42 @@
             }
 
 
+            <div class="card bg-light mb-3">
+                <h5 class="card-header">Add Question and Choices</h5>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label  class="control-label">Question</label>
+                        <input  class="form-control" />
+
+                    </div>
+
+                    <div class="form-group" id="ChoiceGroup">
+                        <label  class="control-label">Choices</label>
+                        <input  class="form-control" />
+                    </div>
+
+                    <div class="form-group row">
+                        <div class="col">
+                            <a onclick="AddChoice()" id="AddChoice" class="btn btn-primary">Add Choice</a>
+                        </div>
+                        <div class="col">
+                            <a href="#" onclick="AddQuesCard()" id="AddChoice" class="btn btn-dark float-right">Add to List</a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+
+
+
+
+            <div id="QuesCards">
             @if(Model != null)
             {
             @for (int i = 0; i < Model.Questions.Count(); i++)
-            {
-            <div class="card mt-3" id="@("q"+ Model.Questions[i].Id +"s" + Model.Id)";>
+                {
+            <div class="card mt-3 mb-3" id="@("q"+ Model.Questions[i].Id +"s" + Model.Id)" ;>
                 <div class="card-header">
                     <input type="hidden" asp-for="Questions[i].Id" />
                     <input style="font-weight: bold;" asp-for="Questions[i].QuestionText" type="text" class="form-control">
@@ -88,6 +119,7 @@
             </div>
 }
             }
+            </div>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
             </div>
@@ -104,29 +136,60 @@
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 <script type="text/javascript">
 
+    var modelCopy = '@Model';
     function deleteQuestion(elementid, Qid) {
-        
 
-        $.ajax({
-            type: "POST",
-            url: "/Home/DeleteQuestion?id="+Qid,
-            contentType: "application/json; charset=utf-8",
-            dataType: "json",
-            success: function (response) {
-                
-            },
-            failure: function (response) {
-                alert(response);
-            }
+        $.post("/Home/DeleteQuestion", {id:Qid}, function (res) {
+            console.log(res);
+            console.log("Delete Successfull");
+            window.location.reload(true);
         });
+        }
 
-        $(document).ajaxStop(function () {
-            window.location.reload();
+    function AddQuesCard() {
+
+        var id = '@Model?.Id';
+        var title = $('#surveyTitle').val();
+        var description = $('#surveyDescription').val();
+        var expiresOn = $('surveyExpiresOn').val();
+
+        var model = {
+            Id:id,
+            Title: title,
+            Description: description,
+            ExpiresOn: expiresOn,
+            Questions: [{ QuestionText: "Q1", Choices: [{ ChoiceText: "c1" }, { ChoiceText: "c2"}] },
+                { QuestionText: "Q2" },
+                { QuestionText: "Q3" }]
+        };
+
+        model.Questions.push({ QuestionText: "Q4", Choices: [{ ChoiceText: "c1" }, { ChoiceText: "c2" }] })
+
+        $.post("/Home/Create/", model, function (res) {
+            console.log(res);
+            window.location = '/Home/Edit?id='+res.id;
         });
+            //$.ajax({
+            //    contentType: 'application/json; charset=utf-8',
+            //    type: 'POST',
+            //    url: '/Home/Create/',
+            //    data: dataObject,
+            //    success: function (response) {
+
+            //    },
+            //    failure: function (response) {
+
+            //    }
+            //});
+
     }
 
-    //$(document).ready(function () {
-    //    alert('ok');
+    //$(document).ajaxStop(function () {
+    //    window.location.reload();
     //});
-    </script>
+
+        $(document).ready(function () {
+            @*alert('@Model.Questions.Count()');*@
+        });
+</script>
 }

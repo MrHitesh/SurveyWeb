@@ -41,9 +41,33 @@ namespace SurveyWebApp.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create(Survey survey)
+        public IActionResult Create(Survey ajaxSurvey)
         {
-            return View(survey);
+
+            var survey = _db.Surveys.Find(ajaxSurvey.Id);
+
+            if (survey != null)
+            {
+                survey.Title = ajaxSurvey.Title;
+                survey.Description = ajaxSurvey.Description;
+                survey.ExpiresOn = ajaxSurvey.ExpiresOn;
+                survey.Questions = ajaxSurvey.Questions;
+            }
+            else
+            {
+                survey = new Survey();
+                survey.Title = ajaxSurvey.Title;
+                survey.Description = ajaxSurvey.Description;
+                survey.CreatedBy = User.Identity.Name;
+                survey.ExpiresOn = ajaxSurvey.ExpiresOn;
+                survey.CreatedOn = DateTime.Now;
+                survey.Questions = ajaxSurvey.Questions;
+
+                _db.Surveys.Add(survey);
+            }
+
+            _db.SaveChanges();
+            return Ok(survey);
         }
 
         public IActionResult Edit(int? id)
@@ -108,18 +132,7 @@ namespace SurveyWebApp.Controllers
             else
             {
                 _db.Surveys.Add(FormSurvey);
-            }
-
-            var quesToRemove = surveyFromdb.Questions.Except(FormSurvey.Questions);
-
-            foreach (var ques in quesToRemove)
-            {
-                foreach (var choice in ques.Choices)
-                {
-                    _db.Choices.Remove(choice);
-                }
-                _db.Questions.Remove(ques);
-            }
+            }          
 
             _db.SaveChanges();
 
@@ -144,7 +157,7 @@ namespace SurveyWebApp.Controllers
             _db.Questions.Remove(questionToDelete);
             _db.SaveChanges();
 
-            return Ok();
+            return Ok(questionToDelete);
         }
         public IActionResult Results()
         {
