@@ -14,6 +14,8 @@
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
+            @if(Model == null)
+            {
             <div class="form-group">
                 <label asp-for="Title" class="control-label"></label>
                 <input id="surveyTitle" asp-for="Title" class="form-control" />
@@ -26,8 +28,6 @@
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
 
-            @if(Model == null)
-            {
             <input type="hidden" asp-for="CreatedOn" value="@DateTime.Now" />
             <div class="form-group">
                 <label asp-for="ExpiresOn" class="control-label"></label>
@@ -38,6 +38,8 @@
             }
             else
             {
+            <input id="surveyTitle" type="hidden" asp-for="Title" />
+            <input id="surveyDescription" type="hidden" asp-for="Description" />
             <fieldset hidden>
                 <div class="form-group">
                     <label asp-for="CreatedOn" class="control-label"></label>
@@ -62,15 +64,30 @@
                 <h5 class="card-header">Add Question and Choices</h5>
                 <div class="card-body">
                     <div class="form-group">
-                        <label  class="control-label">Question</label>
-                        <input  class="form-control" />
+                        <label class="control-label">Question</label>
+                        <input id="questionInput" class="form-control" />
 
                     </div>
 
                     <div class="form-group" id="ChoiceGroup">
-                        <label  class="control-label">Choices</label>
-                        <input  class="form-control" />
+                        <label class="control-label">Choices</label>
                     </div>
+
+                    <div class="form-group">
+                        <ul class="list-group" id="choiceInput" >
+                            <li class="list-group-item">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text">
+                                            <input type="radio" aria-label="Radio button for following text input">
+                                        </div>
+                                    </div>
+                                    <input id="choice1" type="text" class="form-control" aria-label="Text input with radio button">
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    
 
                     <div class="form-group row">
                         <div class="col">
@@ -82,41 +99,41 @@
                     </div>
 
                 </div>
-            </div>
+                </div>
 
 
 
 
 
             <div id="QuesCards">
-            @if(Model != null)
+                @if(Model != null)
             {
-            @for (int i = 0; i < Model.Questions.Count(); i++)
+                @for (int i = 0; i < Model.Questions.Count(); i++)
                 {
-            <div class="card mt-3 mb-3" id="@("q"+ Model.Questions[i].Id +"s" + Model.Id)" ;>
-                <div class="card-header">
-                    <input type="hidden" asp-for="Questions[i].Id" />
-                    <input style="font-weight: bold;" asp-for="Questions[i].QuestionText" type="text" class="form-control">
-                </div>
-                <ul class="list-group list-group-flush">
-                    @for (int j = 0; j < Model.Questions[i].Choices.Count(); j++)
+                <div class="card mt-3 mb-3" id="@("q"+ Model.Questions[i].Id +"s" + Model.Id)" ;>
+                    <div class="card-header">
+                        <input type="hidden" asp-for="Questions[i].Id" />
+                        <input style="font-weight: bold;" asp-for="Questions[i].QuestionText" type="text" class="form-control">
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        @for (int j = 0; j < Model.Questions[i].Choices.Count(); j++)
         {
-                    <li class="list-group-item">
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                                <div class="input-group-text">
-                                    <input type="radio" aria-label="Radio button for following text input" disabled>
+                        <li class="list-group-item">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text">
+                                        <input type="radio" aria-label="Radio button for following text input" disabled>
+                                    </div>
                                 </div>
-                            </div>
-                            <input type="hidden" asp-for="Questions[i].Choices[j].Id" />
-                            <input asp-for="Questions[i].Choices[j].ChoiceText" type="text" class="form-control">
+                                <input type="hidden" asp-for="Questions[i].Choices[j].Id" />
+                                <input asp-for="Questions[i].Choices[j].ChoiceText" type="text" class="form-control">
 
-                        </div>
-                    </li>
+                            </div>
+                        </li>
         }
-                </ul>
-                <a onclick="deleteQuestion('@("q"+ Model.Questions[i].Id +"s" + Model.Id)','@Model.Questions[i].Id')" class="btn btn-danger">Delete</a>
-            </div>
+                    </ul>
+                    <a onclick="deleteQuestion('@("q"+ Model.Questions[i].Id +"s" + Model.Id)','@Model.Questions[i].Id')" class="btn btn-danger">Delete</a>
+                </div>
 }
             }
             </div>
@@ -135,7 +152,7 @@
 
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 <script type="text/javascript">
-
+    var choiceIndex = 2;
     var modelCopy = '@Model';
     function deleteQuestion(elementid, Qid) {
 
@@ -148,22 +165,28 @@
 
     function AddQuesCard() {
 
+        
+
         var id = '@Model?.Id';
         var title = $('#surveyTitle').val();
         var description = $('#surveyDescription').val();
-        var expiresOn = $('surveyExpiresOn').val();
+        var expiresOn = $('#surveyExpiresOn').val();
 
         var model = {
             Id:id,
             Title: title,
             Description: description,
             ExpiresOn: expiresOn,
-            Questions: [{ QuestionText: "Q1", Choices: [{ ChoiceText: "c1" }, { ChoiceText: "c2"}] },
-                { QuestionText: "Q2" },
-                { QuestionText: "Q3" }]
+            Questions: []
         };
 
-        model.Questions.push({ QuestionText: "Q4", Choices: [{ ChoiceText: "c1" }, { ChoiceText: "c2" }] })
+        var inputQuestion = $('#questionInput').val();
+        model.Questions.push({ QuestionText: inputQuestion, Choices: [] });
+
+        var choiceCount = $("#choiceInput").find("li").length;
+        for (var i = 1; i <= choiceCount; i++) {
+            model.Questions[0].Choices.push({ ChoiceText: $('#choice'+i).val() });
+        }
 
         $.post("/Home/Create/", model, function (res) {
             console.log(res);
@@ -184,6 +207,24 @@
 
     }
 
+    function AddChoice() {
+        
+        $('#choiceInput').append('<li class="list-group-item"> \
+            <div class= "input-group" > \
+                <div class="input-group-prepend"> \
+                    <div class="input-group-text"> \
+                        <input type="radio" aria-label="Radio button for following text input"> \
+                    </div> \
+                </div> \
+                <input id="choice'+choiceIndex+'" type="text" class="form-control" aria-label="Text input with radio button"> \
+            </div> \
+        </li>');
+        choiceIndex = choiceIndex + 1;
+        var choiceCount = $("#choiceInput").find("li").length;
+        //alert('Choice count :' + choiceCount);
+
+        
+    }
     //$(document).ajaxStop(function () {
     //    window.location.reload();
     //});

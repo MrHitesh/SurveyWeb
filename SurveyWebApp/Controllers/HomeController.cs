@@ -87,7 +87,7 @@ namespace SurveyWebApp.Controllers
                 return View();
             }
 
-            
+
         }
 
         [HttpPost]
@@ -99,7 +99,6 @@ namespace SurveyWebApp.Controllers
 
             if (surveyFromdb != null)
             {
-
                 surveyFromdb.Title = FormSurvey.Title;
                 surveyFromdb.Description = FormSurvey.Description;
 
@@ -116,23 +115,14 @@ namespace SurveyWebApp.Controllers
                             {
                                 existingChoice.ChoiceText = choice.ChoiceText;
                             }
-                            else
-                            {
-                                existingQues.Choices.Add(choice);
-                            }
                         }
                     }
-                    else
-                    {
-                        surveyFromdb.Questions.Add(que);
-                    }
-
                 }
             }
             else
             {
                 _db.Surveys.Add(FormSurvey);
-            }          
+            }
 
             _db.SaveChanges();
 
@@ -153,7 +143,7 @@ namespace SurveyWebApp.Controllers
             {
                 _db.Choices.Remove(choice);
             }
-            
+
             _db.Questions.Remove(questionToDelete);
             _db.SaveChanges();
 
