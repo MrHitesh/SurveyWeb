@@ -4,6 +4,22 @@
     ViewData["Title"] = "Edit";
 }
 
+<style>
+    .overlay {
+        position: fixed; /* Sit on top of the page content */
+        visibility:hidden;
+        width: 100%; /* Full width (cover the whole page) */
+        height: 100%; /* Full height (cover the whole page) */
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0,0,0,0.5); /* Black background with opacity */
+        z-index: 100; /* Specify a stack order in case you're using a different order for other elements */
+        cursor: pointer; /* Add a pointer on hover */
+    }
+</style>
+
 <div>
     <h4>@Model?.Title</h4>
     <h6>@Model?.Description</h6>
@@ -14,7 +30,7 @@
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
-            @if(Model == null)
+            @if (Model == null)
             {
             <div class="form-group">
                 <label asp-for="Title" class="control-label"></label>
@@ -74,7 +90,7 @@
                     </div>
 
                     <div class="form-group">
-                        <ul class="list-group" id="choiceInput" >
+                        <ul class="list-group" id="choiceInput">
                             <li class="list-group-item">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
@@ -87,7 +103,7 @@
                             </li>
                         </ul>
                     </div>
-                    
+
 
                     <div class="form-group row">
                         <div class="col">
@@ -99,17 +115,14 @@
                     </div>
 
                 </div>
-                </div>
-
-
-
+            </div>
 
 
             <div id="QuesCards">
-                @if(Model != null)
-            {
-                @for (int i = 0; i < Model.Questions.Count(); i++)
+                @if (Model != null)
                 {
+                @for (int i = 0; i < Model.Questions.Count(); i++)
+                    {
                 <div class="card mt-3 mb-3" id="@("q"+ Model.Questions[i].Id +"s" + Model.Id)" ;>
                     <div class="card-header">
                         <input type="hidden" asp-for="Questions[i].Id" />
@@ -117,7 +130,7 @@
                     </div>
                     <ul class="list-group list-group-flush">
                         @for (int j = 0; j < Model.Questions[i].Choices.Count(); j++)
-        {
+                                {
                         <li class="list-group-item">
                             <div class="input-group">
                                 <div class="input-group-prepend">
@@ -130,12 +143,12 @@
 
                             </div>
                         </li>
-        }
+                                }
                     </ul>
                     <a onclick="deleteQuestion('@("q"+ Model.Questions[i].Id +"s" + Model.Id)','@Model.Questions[i].Id')" class="btn btn-danger">Delete</a>
                 </div>
-}
-            }
+                    }
+                }
             </div>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
@@ -144,6 +157,12 @@
     </div>
 </div>
 
+    <div id="overlay" class="overlay d-flex justify-content-center align-items-center">
+        <div class="spinner-border text-light" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>
+
 <div>
     <a asp-action="Index">Back to List</a>
 </div>
@@ -151,12 +170,13 @@
 @section Scripts {
 
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-<script type="text/javascript">
+    <script type="text/javascript">
     var choiceIndex = 2;
     var modelCopy = '@Model';
     function deleteQuestion(elementid, Qid) {
-
-        $.post("/Home/DeleteQuestion", {id:Qid}, function (res) {
+        
+        $("#overlay").css({ "visibility": "visible" });
+        $.post("/Home/DeleteQuestion", { id: Qid }, function (res) {
             console.log(res);
             console.log("Delete Successfull");
             window.location.reload(true);
@@ -165,7 +185,7 @@
 
     function AddQuesCard() {
 
-        
+        $("#overlay").css({ "visibility": "visible" });
 
         var id = '@Model?.Id';
         var title = $('#surveyTitle').val();
@@ -208,7 +228,7 @@
     }
 
     function AddChoice() {
-        
+
         $('#choiceInput').append('<li class="list-group-item"> \
             <div class= "input-group" > \
                 <div class="input-group-prepend"> \
@@ -220,10 +240,7 @@
             </div> \
         </li>');
         choiceIndex = choiceIndex + 1;
-        var choiceCount = $("#choiceInput").find("li").length;
         //alert('Choice count :' + choiceCount);
-
-        
     }
     //$(document).ajaxStop(function () {
     //    window.location.reload();
@@ -232,5 +249,9 @@
         $(document).ready(function () {
             @*alert('@Model.Questions.Count()');*@
         });
-</script>
+    </script>
 }
+
+
+
+
