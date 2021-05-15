@@ -18,5 +18,6 @@ namespace EFDataAccessLibrary.DataAccess
         public DbSet<Survey> Surveys { get; set; }
         public DbSet<Question> Questions { get; set; }
         public DbSet<Choice> Choices { get; set; }
+        public DbSet<SurveyResponse> Responses { get; set; }
     }
 }

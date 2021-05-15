@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -30,5 +31,41 @@ namespace EFDataAccessLibrary.Models
     {
         public int Id { get; set; }
         public string ChoiceText { get; set; }
+
+        public override bool Equals(object obj)
+        {
+            var choice = (Choice)obj;
+            //Check for null and compare run-time types.
+            if ((obj == null) || (this.Id != choice.Id))
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+        public override int GetHashCode()
+        {
+            return (this.Id.GetHashCode() << 2) ^ this.Id.GetHashCode();
+        }
+    }
+
+    public class SurveyResponse
+    {
+        public int Id { get; set; }
+        [Required]
+        public Survey Survey { get; set; }
+        [Required]
+        public Question Question { get; set; }
+        [Required]
+        public Choice Choice { get; set; }
+        [Required]
+        [MaxLength(10)]
+        [Column(TypeName="varchar(10)")]
+        public string EmployeeId { get; set; }
+        [Required]
+        public DateTime UpdatedOn { get; set; } = DateTime.Now;
+        
     }
 }

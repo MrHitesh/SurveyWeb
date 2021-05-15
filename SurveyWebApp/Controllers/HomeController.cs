@@ -149,9 +149,71 @@ namespace SurveyWebApp.Controllers
 
             return Ok(questionToDelete);
         }
-        public IActionResult Results()
+        public IActionResult Results(int surveyId)
         {
-            return View();
+            surveyId = 45;
+            List<SurveyResponse> srs = _db.Responses
+                .Include(y=>y.Choice)
+                .Include(a=>a.Survey)
+                .ThenInclude(x=>x.Questions)
+                .Where(x => x.Survey.Id == surveyId).ToList();
+            ResultViewModel vm = new ResultViewModel();
+            vm.Survey = srs.FirstOrDefault().Survey;
+            vm.Responses = srs;
+
+            vm.ResponseChartData = new List<ResponseChartData>();
+            
+            foreach (var ques in vm.Survey.Questions)
+            {
+                var rcd = new ResponseChartData();
+                rcd.ChartRows = new List<ChoiceToCount>();
+                rcd.QuestionText = ques.QuestionText;
+                var responseChoices = vm.Responses.Where(x => x.Question.Id == ques.Id);
+                var choiceToCountList = from r in responseChoices
+                         group r by r.Choice into grp
+                         select new ChoiceToCount() { ChoiceText = grp.Key.ChoiceText, Count = grp.Count() };
+
+                rcd.ChartRows.AddRange(choiceToCountList);
+                vm.ResponseChartData.Add(rcd);
+            }
+
+            
+
+            return View(vm);
+        }
+
+        [HttpGet]
+        public IActionResult UserResponse(int surveyId, string employeeId)
+        {
+            Random gen = new Random();
+            employeeId = gen.Next(0, 999999).ToString();
+            ResponseViewModel vm = new ResponseViewModel();
+            vm.Survey = _db.Surveys.AsNoTracking()
+                .Include(a => a.Questions)
+                .ThenInclude(x => x.Choices)
+                .FirstOrDefault(y => y.Id == surveyId);
+
+            foreach (var item in vm.Survey.Questions)
+            {
+                vm.Responses.Add(new SurveyResponse() {  EmployeeId = employeeId});
+            }
+
+            return View(vm);
+        }
+        [HttpPost]
+        public IActionResult UserResponse(ResponseViewModel responseViewModel)
+        {
+            foreach (var response in responseViewModel.Responses)
+            {
+                response.Choice = _db.Choices.Find(response.Choice.Id);
+                response.Survey = _db.Surveys.Find(response.Survey.Id);
+                response.Question = _db.Questions.Find(response.Question.Id);
+                _db.Responses.Add(response);
+                
+            }
+            _db.SaveChanges();
+
+            return View("ResponseRecieved");
         }
 
         public IActionResult Privacy()
