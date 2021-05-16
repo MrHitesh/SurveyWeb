@@ -1,29 +1,44 @@
 ﻿@model SurveyWebApp.Models.ResultViewModel
 @{
-ViewData["Title"] = "Results";
+    ViewData["Title"] = "Results";
 }
 
-<div>
-    <h4>@Model.Survey.Title</h4>
-    <div id="chartList" class="container" >
+<div class="row">
+
+    <div class="col">
+
+        <h4>@Model?.Survey?.Title</h4>
+        <div class="input-group">
+            <select onchange="LoadResults(this.options[this.selectedIndex].value)" class="custom-select" id="surveySelector" aria-label="Select survey to display results">
+                <option selected>Please select a Survey...</option>
+                @foreach (var survey in ViewBag.SurveysDropDown)
+                {
+                    <option value="@survey.Id">@survey.Title</option>
+                }
+            </select>
         </div>
     
-        
-    
+        @if(!string.IsNullOrEmpty(ViewBag.Message))
+        {
+    <div class="card mt-3 mb-3">
+        <div class="card-body">
+            @ViewBag.Message
+        </div>
+    </div>
+        }
+
+        <div id="chartList">
+        </div>
+
+    </div>
 </div>
 
 @section Scripts {
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
 
-        var quesText = '@Model.ResponseChartData[0].QuestionText';
-        console.log(quesText);
-
          var model = @Json.Serialize(Model);
         console.log(model);
-
-        var oneQues = model.responseChartData[0].chartRows;
-        console.log(oneQues);
 
         // Load the Visualization API and the corechart package.
         google.charts.load('current', { 'packages': ['corechart'] });
@@ -66,23 +81,20 @@ ViewData["Title"] = "Results";
 
                 // Set chart options
                 var options = {
-                    'title': quesText,
+                    'title': model.responseChartData[i].questionText,
                     'width': 800,
                     'height': 200,
-                    'chartArea': { left: 1, top: 20, width: '100%', height: '75%' }
+                    'chartArea': { left: 1, top: 30, width: '100%', height: '75%' }
                 };
 
                 var chart = new google.visualization.PieChart(document.getElementById('chart_div' + i));
                 chart.draw(data, options);
 
             }
-
-            // Create the data table.
-            
-            // Instantiate and draw our chart, passing in some options.
-
-          
-           
+        }
+        function LoadResults(id) {
+            //var surveyid = document.getElementById("surveySelector").value;
+            window.location = '/Home/Results?surveyId=' + id;
         }
     </script>
 }

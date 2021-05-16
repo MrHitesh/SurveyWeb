@@ -30,7 +30,7 @@ namespace SurveyWebApp.Controllers
         public IActionResult Index()
         {
             Seed.SeedData(_db, _httpContextAccessor);
-            ViewData.Model = _db.Surveys.Where(x => x.CreatedBy == User.Identity.Name);
+            ViewData.Model = _db.Surveys.Where(x => x.CreatedBy == User.Identity.Name).OrderByDescending(x=>x.CreatedOn);
             return View();
         }
 
@@ -151,40 +151,59 @@ namespace SurveyWebApp.Controllers
         }
         public IActionResult Results(int surveyId)
         {
-            surveyId = 45;
-            List<SurveyResponse> srs = _db.Responses
-                .Include(y=>y.Choice)
-                .Include(a=>a.Survey)
-                .ThenInclude(x=>x.Questions)
-                .Where(x => x.Survey.Id == surveyId).ToList();
-            ResultViewModel vm = new ResultViewModel();
-            vm.Survey = srs.FirstOrDefault().Survey;
-            vm.Responses = srs;
+            ViewBag.SurveysDropDown = _db.Surveys
+                .Select(c => new Survey() {  Id = c.Id, Title = c.Title, CreatedOn = c.CreatedOn })
+                .ToList().OrderByDescending(x=>x.CreatedOn);
 
-            vm.ResponseChartData = new List<ResponseChartData>();
-            
-            foreach (var ques in vm.Survey.Questions)
+            if (surveyId != 0)
             {
-                var rcd = new ResponseChartData();
-                rcd.ChartRows = new List<ChoiceToCount>();
-                rcd.QuestionText = ques.QuestionText;
-                var responseChoices = vm.Responses.Where(x => x.Question.Id == ques.Id);
-                var choiceToCountList = from r in responseChoices
-                         group r by r.Choice into grp
-                         select new ChoiceToCount() { ChoiceText = grp.Key.ChoiceText, Count = grp.Count() };
 
-                rcd.ChartRows.AddRange(choiceToCountList);
-                vm.ResponseChartData.Add(rcd);
+
+                List<SurveyResponse> srs = _db.Responses
+                    .Include(y => y.Choice)
+                    .Include(a => a.Survey)
+                    .ThenInclude(x => x.Questions)
+                    .Where(x => x.Survey.Id == surveyId).ToList();
+                ResultViewModel vm = new ResultViewModel();
+
+                if (srs == null || srs.Count() == 0)
+                {
+                    ViewBag.Message = "No Responses yet.";
+                    return View();
+                }
+                vm.Survey = srs.FirstOrDefault().Survey;
+                vm.Responses = srs;
+
+                vm.ResponseChartData = new List<ResponseChartData>();
+
+                foreach (var ques in vm.Survey.Questions)
+                {
+                    var rcd = new ResponseChartData();
+                    rcd.ChartRows = new List<ChoiceToCount>();
+                    rcd.QuestionText = ques.QuestionText;
+                    var responseChoices = vm.Responses.Where(x => x.Question.Id == ques.Id);
+                    var choiceToCountList = from r in responseChoices
+                                            group r by r.Choice into grp
+                                            select new ChoiceToCount() { ChoiceText = grp.Key.ChoiceText, Count = grp.Count() };
+
+                    rcd.ChartRows.AddRange(choiceToCountList);
+                    vm.ResponseChartData.Add(rcd);
+                }
+
+
+
+                return View(vm);
             }
-
-            
-
-            return View(vm);
+            return View();
         }
 
         [HttpGet]
         public IActionResult UserResponse(int surveyId, string employeeId)
         {
+            ViewBag.SurveysDropDown = _db.Surveys
+                .Select(c => new Survey() { Id = c.Id, Title = c.Title, CreatedOn = c.CreatedOn })
+                .ToList().OrderByDescending(x => x.CreatedOn);
+
             Random gen = new Random();
             employeeId = gen.Next(0, 999999).ToString();
             ResponseViewModel vm = new ResponseViewModel();
