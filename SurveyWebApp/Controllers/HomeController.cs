@@ -204,6 +204,11 @@ namespace SurveyWebApp.Controllers
                 .Select(c => new Survey() { Id = c.Id, Title = c.Title, CreatedOn = c.CreatedOn })
                 .ToList().OrderByDescending(x => x.CreatedOn);
 
+            if (surveyId == 0)
+            {
+                return View();
+            }
+
             Random gen = new Random();
             employeeId = gen.Next(0, 999999).ToString();
             ResponseViewModel vm = new ResponseViewModel();
