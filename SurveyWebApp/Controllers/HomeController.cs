@@ -75,8 +75,18 @@ namespace SurveyWebApp.Controllers
             return Ok(survey);
         }
 
+        public IActionResult SurveyList()
+        {
+            ViewData.Model = _db.Surveys.OrderByDescending(x=>x.CreatedOn);
+            return View();
+        }
+
         public IActionResult Edit(int? id)
         {
+            ViewBag.SurveysDropDown = _db.Surveys
+                .Select(c => new Survey() { Id = c.Id, Title = c.Title, CreatedOn = c.CreatedOn })
+                .ToList().OrderByDescending(x => x.CreatedOn);
+
             Survey survey = new Survey();
 
             if (id != null)
@@ -190,9 +200,6 @@ namespace SurveyWebApp.Controllers
                     rcd.ChartRows.AddRange(choiceToCountList);
                     vm.ResponseChartData.Add(rcd);
                 }
-
-
-
                 return View(vm);
             }
             return View();
