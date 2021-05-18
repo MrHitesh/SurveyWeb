@@ -2,19 +2,34 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="list-group">
+<div class="row">
+    <div class="col">
+        <h3>Active Surveys</h3>
+        <hr />
+    </div>
+</div>
+<div class="row">
     @foreach (var item in Model)
     {
-        <a href="@Url.Action("Edit", "Home", new { id = item.Id })" class="list-group-item list-group-item-action ">
-            <div class="d-flex w-100 justify-content-between">
-                <h5 class="mb-1">@item.Title</h5>
-                <small>Expires on @item.ExpiresOn</small>
+        <div class="row mb-4 mr-1 ml-3">
+            <div class="card">
+                <div class="card-body">
+                    <a href="@Url.Action("PreviewAndPublish", "Home", new { surveyId = item.Id })" class="list-group-item-action ">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="card-title">@item.Title</h5>
+                        </div>
+                        <h6 class="card-subtitle mb-2 text-muted">@item.Description</h6>
+
+                        <span style="font-size:small; font-weight:500">Expires on </span><small>@item.ExpiresOn</small><br />
+                        <span style="font-size:small; font-weight:500">Created on </span><small>@item.CreatedOn</small>
+                    </a>
+                </div>
+                <div class="card-footer">
+                    <a href="@Url.Action("Results", "Home", new { surveyId = item.Id })">Results</a>
+                </div>
             </div>
-            <p class="mb-1">@item.Description</p>
-            <small>Created on @item.CreatedOn</small>
-        </a>
+        </div>
     }
 </div>
 
 
-   

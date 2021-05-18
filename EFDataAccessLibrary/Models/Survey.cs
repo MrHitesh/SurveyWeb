@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -19,6 +20,7 @@ namespace EFDataAccessLibrary.Models
         public DateTime CreatedOn { get; set; } = DateTime.Now;
         [Required]
         public DateTime ExpiresOn { get; set; }
+        public DateTime? PublishedOn { get; set; }
     }
     public class Question
     {

@@ -1,0 +1,33 @@
+﻿@model SurveyWebApp.Models.ResponseViewModel
+@{
+}
+
+<div id="QuesCards">
+    @if (Model != null)
+    {
+        @for (int i = 0; i < Model.Survey.Questions.Count(); i++)
+        {
+            <input type="hidden" asp-for="Responses[i].Question.Id" value="@Model.Survey.Questions[i].Id" />
+            <input type="hidden" asp-for="Responses[i].Survey.Id" value="@Model.Survey.Id" />
+            <input type="hidden" asp-for="Responses[i].EmployeeId" />
+
+            <div class="card mt-3 mb-3" id="@("q"+ Model.Survey.Questions[i].Id +"s" + Model.Survey.Id)" ;>
+                <h6 asp-for="Survey.Questions[i].QuestionText" class="card-header"> @Model.Survey.Questions[i].QuestionText</h6>
+                @*<input style="font-weight: bold;" asp-for="Survey.Questions[i].QuestionText" type="text" class="form-control">*@
+
+                <ul class="list-group list-group-flush">
+                    @for (int j = 0; j < Model.Survey.Questions[i].Choices.Count(); j++)
+                    {
+                        <li class="list-group-item">
+
+                            <div class="custom-control custom-radio">
+                                <input type="radio" id="@("choice"+j+"ques"+i)" asp-for="Responses[i].Choice.Id" class="custom-control-input" value="@Model.Survey.Questions[i].Choices[j].Id" />
+                                <label class="custom-control-label" for="@("choice"+j+"ques"+i)">@Model.Survey.Questions[i].Choices[j].ChoiceText</label>
+                            </div>
+                        </li>
+                    }
+                </ul>
+            </div>
+        }
+    }
+</div>

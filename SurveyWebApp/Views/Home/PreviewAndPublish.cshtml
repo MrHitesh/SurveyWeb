@@ -1,0 +1,74 @@
+﻿@model SurveyWebApp.Models.ResponseViewModel
+
+@{
+    ViewData["Title"] = "Response";
+}
+
+<div class="input-group mt-2 mb-2">
+    <select onchange="LoadSurvey(this.options[this.selectedIndex].value)" class="custom-select" id="surveySelector" aria-label="Survey list">
+        <option selected>Please select a Survey...</option>
+        @foreach (var survey in ViewBag.SurveysDropDown)
+        {
+            <option value="@survey.Id">@survey.Title</option>
+        }
+    </select>
+</div>
+
+@if (Model != null)
+{
+    <div class="card gradient-custom mb-3">
+        <div class="card-body">
+            <h4>@Model?.Survey?.Title</h4>
+            <h6>@Model?.Survey?.Description</h6>
+        </div>
+    </div>
+        <div class="row">
+            <div class="col">
+                <div class="input-group" style="max-width:300px">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="EmployeeId">Employee Id</span>
+                    </div>
+                    <input type="text" asp-for="EmployeeId" class="form-control" placeholder="Enter Employee Id" aria-label="Username">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                @await Html.PartialAsync("_DisplayQnA", Model)
+                <form asp-action="PreviewAndPublish">
+                    <input type="hidden" asp-for="Survey.Id" />
+                    @if (Model.Survey.PublishedOn == null)
+                    {
+                        <input type="hidden" asp-for="Survey.PublishedOn" value="@DateTime.Now" />
+                        <div class="form-group mt-3 mb-3 float-lg-right">
+                            @*<input type="submit" value="Submit" class="btn btn-primary" />*@
+                            <button href="#" id="Submit" class="btn btn-success">Publish</button>
+                        </div>
+                    }
+                    else
+                    {
+                        <input type="hidden" asp-for="Survey.PublishedOn" value="" />
+                        <div class="form-group mt-3 mb-3 float-lg-right">
+                            @*<input type="submit" value="Submit" class="btn btn-primary" />*@
+                            <button href="#" id="Submit" class="btn btn-danger">Undo Publish</button>
+                        </div>
+                    }
+                </form>
+            </div>
+        </div>
+}
+
+
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script type="text/javascript">
+        function LoadSurvey(id) {
+            window.location = '/Home/PreviewAndPublish?surveyId=' + id;
+        }
+    </script>
+}

@@ -8,6 +8,7 @@ namespace SurveyWebApp.Models
 {
     public class ResponseViewModel
     {
+        public string EmployeeId { get; set; }
         public Survey Survey { get; set; }
         public List<SurveyResponse> Responses { get; set; } = new List<SurveyResponse>();
     }

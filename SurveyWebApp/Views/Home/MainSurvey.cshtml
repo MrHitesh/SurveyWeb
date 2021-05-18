@@ -1,0 +1,61 @@
+﻿@model SurveyWebApp.Models.ResponseViewModel
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - SurveyWebApp</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body>
+    <header>
+    </header>
+    <div class="container">
+        <main role="main" >
+            @{ Layout = null; }
+            @if (Model != null)
+            {
+                <form asp-action="MainSurvey">
+                    <div class="card gradient-custom mb-3">
+                        <div class="card-body">
+                            <h4>@Model?.Survey?.Title</h4>
+                            <h6>@Model?.Survey?.Description</h6>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <div class="input-group" style="max-width:300px">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" id="EmployeeId">Employee Id</span>
+                                </div>
+                                <input type="text" asp-for="EmployeeId" class="form-control" placeholder="Enter Employee Id" aria-label="Username">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            @await Html.PartialAsync("_DisplayQnA", Model)
+                            <div class="form-group mt-3 mb-3 float-right">
+                                <input onclick="Save()" type="submit" value="Submit" class="btn btn-primary" />
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            }
+        </main>
+    </div>
+
+
+
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2021 - SurveyWebApp
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+</body>
+</html>

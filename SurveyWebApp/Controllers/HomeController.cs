@@ -29,15 +29,17 @@ namespace SurveyWebApp.Controllers
 
         public IActionResult Index()
         {
-            Seed.SeedData(_db, _httpContextAccessor);
-            ViewData.Model = _db.Surveys.Where(x => x.CreatedBy == User.Identity.Name).OrderByDescending(x=>x.CreatedOn);
+            //Seed.SeedData(_db, _httpContextAccessor);
+            //ViewData.Model = _db.Surveys.Where(x => x.CreatedBy == User.Identity.Name).OrderByDescending(x=>x.CreatedOn);
+
+            ViewData.Model = _db.Surveys.Where(x => x.PublishedOn != null && x.ExpiresOn >= DateTime.Now).OrderByDescending(x => x.CreatedOn);
             return View();
         }
 
         [HttpGet]
         public IActionResult Create()
         {
-            return View();
+            return View("Edit");
         }
 
         [HttpPost]
@@ -126,11 +128,7 @@ namespace SurveyWebApp.Controllers
 
             _db.SaveChanges();
 
-            var s = _db.Surveys
-                .Include(a => a.Questions)
-                .ThenInclude(x => x.Choices)
-                .FirstOrDefault(y => y.Id == FormSurvey.Id);
-            return View(s);
+            return Edit(FormSurvey.Id);
         }
 
         [HttpPost]
@@ -198,7 +196,7 @@ namespace SurveyWebApp.Controllers
         }
 
         [HttpGet]
-        public IActionResult UserResponse(int surveyId, string employeeId)
+        public IActionResult PreviewAndPublish(int surveyId)
         {
             ViewBag.SurveysDropDown = _db.Surveys
                 .Select(c => new Survey() { Id = c.Id, Title = c.Title, CreatedOn = c.CreatedOn })
@@ -209,8 +207,6 @@ namespace SurveyWebApp.Controllers
                 return View();
             }
 
-            Random gen = new Random();
-            employeeId = gen.Next(0, 999999).ToString();
             ResponseViewModel vm = new ResponseViewModel();
             vm.Survey = _db.Surveys.AsNoTracking()
                 .Include(a => a.Questions)
@@ -219,26 +215,66 @@ namespace SurveyWebApp.Controllers
 
             foreach (var item in vm.Survey.Questions)
             {
-                vm.Responses.Add(new SurveyResponse() {  EmployeeId = employeeId});
+                vm.Responses.Add(new SurveyResponse());
             }
 
             return View(vm);
         }
+
         [HttpPost]
-        public IActionResult UserResponse(ResponseViewModel responseViewModel)
+        public IActionResult PreviewAndPublish(ResponseViewModel responseViewModel)
+        {
+            Survey survey = _db.Surveys.Find(responseViewModel.Survey.Id);
+            survey.PublishedOn = responseViewModel.Survey.PublishedOn;
+
+            _db.SaveChanges();
+
+            return PreviewAndPublish(responseViewModel.Survey.Id);
+        }
+
+        [HttpGet]
+        public IActionResult MainSurvey(int surveyId, string employeeId)
+        {
+            ViewBag.SurveysDropDown = _db.Surveys
+                .Select(c => new Survey() { Id = c.Id, Title = c.Title, CreatedOn = c.CreatedOn })
+                .ToList().OrderByDescending(x => x.CreatedOn);
+
+            if (surveyId == 0)
+            {
+                return View();
+            }
+
+            ResponseViewModel vm = new ResponseViewModel();
+            vm.Survey = _db.Surveys.AsNoTracking()
+                .Include(a => a.Questions)
+                .ThenInclude(x => x.Choices)
+                .FirstOrDefault(y => y.Id == surveyId);
+
+            foreach (var item in vm.Survey.Questions)
+            {
+                vm.Responses.Add(new SurveyResponse() { });
+            }
+            vm.EmployeeId = employeeId;
+
+            return View(vm);
+        }
+        [HttpPost]
+        public IActionResult MainSurvey(ResponseViewModel responseViewModel)
         {
             foreach (var response in responseViewModel.Responses)
             {
                 response.Choice = _db.Choices.Find(response.Choice.Id);
                 response.Survey = _db.Surveys.Find(response.Survey.Id);
                 response.Question = _db.Questions.Find(response.Question.Id);
+                response.EmployeeId = responseViewModel.EmployeeId;
                 _db.Responses.Add(response);
-                
+
             }
             _db.SaveChanges();
 
             return View("ResponseRecieved");
         }
+
 
         public IActionResult Privacy()
         {

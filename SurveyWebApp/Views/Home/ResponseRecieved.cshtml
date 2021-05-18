@@ -1,9 +1,40 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - SurveyWebApp</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body>
+    <header>
+    </header>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @{ Layout = null; }
 
-<h2>Response Recieved.</h2>
-<h3>Thank you.</h3>
-<h2>You may close the window now.</h2>
+            <div id="overlay" class="d-flex align-items-center justify-content-center" style="height:500px; text-align:center;">
+                <div>
+                    <h2>Response Recieved</h2>
+                    <h3>Thank you</h3>
+                    <p class="mb-1">Please close the tab</p>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+
+
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2021 - SurveyWebApp
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    
+</body>
+</html>

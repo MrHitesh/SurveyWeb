@@ -7,7 +7,7 @@
 <style>
     .overlay {
         position: fixed; /* Sit on top of the page content */
-        visibility:hidden;
+        visibility: hidden;
         width: 100%; /* Full width (cover the whole page) */
         height: 100%; /* Full height (cover the whole page) */
         top: 0;
@@ -20,11 +20,16 @@
     }
 </style>
 
-<div>
-    <h4>@Model?.Title</h4>
-    <h6>@Model?.Description</h6>
-</div>
-<hr />
+@if (Model != null)
+{
+    <div class="card gradient-custom mb-3">
+        <div class="card-body">
+            <h4>@Model?.Title</h4>
+            <h6>@Model?.Description</h6>
+        </div>
+    </div>
+}
+
 <div class="row">
     <div class="col">
         <form asp-action="Edit">
@@ -32,47 +37,47 @@
             <input type="hidden" asp-for="Id" />
             @if (Model == null)
             {
-            <div class="form-group">
-                <label asp-for="Title" class="control-label"></label>
-                <input id="surveyTitle" asp-for="Title" class="form-control" />
-                <span asp-validation-for="Title" class="text-danger"></span>
-
-            </div>
-            <div class="form-group">
-                <label asp-for="Description" class="control-label"></label>
-                <input id="surveyDescription" asp-for="Description" class="form-control" />
-                <span asp-validation-for="Description" class="text-danger"></span>
-            </div>
-
-            <input type="hidden" asp-for="CreatedOn" value="@DateTime.Now" />
-            <div class="form-group">
-                <label asp-for="ExpiresOn" class="control-label"></label>
-                <input asp-for="ExpiresOn" class="form-control" />
-                <span asp-validation-for="ExpiresOn" class="text-danger"></span>
-            </div>
-            <input type="hidden" asp-for="CreatedBy" value="@User.Identity.Name" />
-            }
-            else
-            {
-            <input id="surveyTitle" type="hidden" asp-for="Title" />
-            <input id="surveyDescription" type="hidden" asp-for="Description" />
-            <fieldset hidden>
                 <div class="form-group">
-                    <label asp-for="CreatedOn" class="control-label"></label>
-                    <input asp-for="CreatedOn" class="form-control" />
-                    <span asp-validation-for="CreatedOn" class="text-danger"></span>
+                    <label asp-for="Title" class="control-label"></label>
+                    <input id="surveyTitle" asp-for="Title" class="form-control" />
+                    <span asp-validation-for="Title" class="text-danger"></span>
+
                 </div>
+                <div class="form-group">
+                    <label asp-for="Description" class="control-label"></label>
+                    <input id="surveyDescription" asp-for="Description" class="form-control" />
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+
+                <input type="hidden" asp-for="CreatedOn" value="@DateTime.Now" />
                 <div class="form-group">
                     <label asp-for="ExpiresOn" class="control-label"></label>
                     <input id="surveyExpiresOn" asp-for="ExpiresOn" class="form-control" />
                     <span asp-validation-for="ExpiresOn" class="text-danger"></span>
                 </div>
-                <div class="form-group">
-                    <label asp-for="CreatedBy" class="control-label"></label>
-                    <input asp-for="CreatedBy" class="form-control" />
-                    <span asp-validation-for="CreatedBy" class="text-danger"></span>
-                </div>
-            </fieldset>
+                <input type="hidden" asp-for="CreatedBy" value="@User.Identity.Name" />
+            }
+            else
+            {
+                <input id="surveyTitle" type="hidden" asp-for="Title" />
+                <input id="surveyDescription" type="hidden" asp-for="Description" />
+                <fieldset hidden>
+                    <div class="form-group">
+                        <label asp-for="CreatedOn" class="control-label"></label>
+                        <input asp-for="CreatedOn" class="form-control" />
+                        <span asp-validation-for="CreatedOn" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="ExpiresOn" class="control-label"></label>
+                        <input id="surveyExpiresOn" asp-for="ExpiresOn" class="form-control" />
+                        <span asp-validation-for="ExpiresOn" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="CreatedBy" class="control-label"></label>
+                        <input asp-for="CreatedBy" class="form-control" />
+                        <span asp-validation-for="CreatedBy" class="text-danger"></span>
+                    </div>
+                </fieldset>
             }
 
 
@@ -121,32 +126,32 @@
             <div id="QuesCards">
                 @if (Model != null)
                 {
-                @for (int i = 0; i < Model.Questions.Count(); i++)
+                    @for (int i = 0; i < Model.Questions.Count(); i++)
                     {
-                <div class="card mt-3 mb-3" id="@("q"+ Model.Questions[i].Id +"s" + Model.Id)" ;>
-                    <div class="card-header">
-                        <input type="hidden" asp-for="Questions[i].Id" />
-                        <input style="font-weight: bold;" asp-for="Questions[i].QuestionText" type="text" class="form-control">
-                    </div>
-                    <ul class="list-group list-group-flush">
-                        @for (int j = 0; j < Model.Questions[i].Choices.Count(); j++)
-                                {
-                        <li class="list-group-item">
-                            <div class="input-group">
-                                <div class="input-group-prepend">
-                                    <div class="input-group-text">
-                                        <input type="radio" aria-label="Radio button for following text input" disabled>
-                                    </div>
-                                </div>
-                                <input type="hidden" asp-for="Questions[i].Choices[j].Id" />
-                                <input asp-for="Questions[i].Choices[j].ChoiceText" type="text" class="form-control">
-
+                        <div class="card mt-3 mb-3" id="@("q"+ Model.Questions[i].Id +"s" + Model.Id)" ;>
+                            <div class="card-header">
+                                <input type="hidden" asp-for="Questions[i].Id" />
+                                <input style="font-weight: bold;" asp-for="Questions[i].QuestionText" type="text" class="form-control">
                             </div>
-                        </li>
+                            <ul class="list-group list-group-flush">
+                                @for (int j = 0; j < Model.Questions[i].Choices.Count(); j++)
+                                {
+                                    <li class="list-group-item">
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <div class="input-group-text">
+                                                    <input type="radio" aria-label="Radio button for following text input" disabled>
+                                                </div>
+                                            </div>
+                                            <input type="hidden" asp-for="Questions[i].Choices[j].Id" />
+                                            <input asp-for="Questions[i].Choices[j].ChoiceText" type="text" class="form-control">
+
+                                        </div>
+                                    </li>
                                 }
-                    </ul>
-                    <a onclick="deleteQuestion('@("q"+ Model.Questions[i].Id +"s" + Model.Id)','@Model.Questions[i].Id')" class="btn btn-danger">Delete</a>
-                </div>
+                            </ul>
+                            <a onclick="deleteQuestion('@("q"+ Model.Questions[i].Id +"s" + Model.Id)','@Model.Questions[i].Id')" class="btn btn-danger">Delete</a>
+                        </div>
                     }
                 }
             </div>
@@ -157,11 +162,11 @@
     </div>
 </div>
 
-    <div id="overlay" class="overlay d-flex justify-content-center align-items-center">
-        <div class="spinner-border text-light" role="status">
-            <span class="sr-only">Loading...</span>
-        </div>
+<div id="overlay" class="overlay d-flex justify-content-center align-items-center">
+    <div class="spinner-border text-light" role="status">
+        <span class="sr-only">Loading...</span>
     </div>
+</div>
 
 <div>
     <a asp-action="Index">Back to List</a>
@@ -174,7 +179,7 @@
     var choiceIndex = 2;
     var modelCopy = '@Model';
     function deleteQuestion(elementid, Qid) {
-        
+
         $("#overlay").css({ "visibility": "visible" });
         $.post("/Home/DeleteQuestion", { id: Qid }, function (res) {
             console.log(res);
