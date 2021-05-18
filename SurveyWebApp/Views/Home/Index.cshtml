@@ -2,34 +2,73 @@
     ViewData["Title"] = "Home Page";
 }
 
+        <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-delay="2000" style="position: absolute; top: 4rem; right: 1rem; z-index:100">
+            <div class="toast-header">
+                <strong class="mr-auto text-primary">Message</strong>
+                <small class="text-muted">now</small>
+                <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="toast-body">
+                Copied to clipboard!
+            </div>
+        </div>
+
 <div class="row">
     <div class="col">
         <h3>Active Surveys</h3>
         <hr />
     </div>
 </div>
-<div class="row">
+<div class="row align-content-center">
+    @if(Model != null)
+    {
     @foreach (var item in Model)
     {
-        <div class="row mb-4 mr-1 ml-3">
-            <div class="card">
-                <div class="card-body">
-                    <a href="@Url.Action("PreviewAndPublish", "Home", new { surveyId = item.Id })" class="list-group-item-action ">
-                        <div class="d-flex w-100 justify-content-between">
-                            <h5 class="card-title">@item.Title</h5>
-                        </div>
-                        <h6 class="card-subtitle mb-2 text-muted">@item.Description</h6>
+    <div class="row mb-4 mr-1 ml-3">
+        <div class="card">
+            <div class="card-body">
+                <a href="@Url.Action("PreviewAndPublish", "Home", new { surveyId = item.Id })" class="list-group-item-action ">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="card-title">@item.Title</h5>
+                    </div>
+                    <h6 class="card-subtitle mb-2 text-muted">@item.Description</h6>
 
-                        <span style="font-size:small; font-weight:500">Expires on </span><small>@item.ExpiresOn</small><br />
-                        <span style="font-size:small; font-weight:500">Created on </span><small>@item.CreatedOn</small>
-                    </a>
-                </div>
-                <div class="card-footer">
-                    <a href="@Url.Action("Results", "Home", new { surveyId = item.Id })">Results</a>
-                </div>
+                    <span style="font-size:small; font-weight:500">Expires on </span><small>@item.ExpiresOn</small><br />
+                    <span style="font-size:small; font-weight:500">Created on </span><small>@item.CreatedOn</small>
+                </a>
+            </div>
+            <div class="card-footer" style="padding:0.5rem !important">
+
+                <a href="@Url.Action("Results", "Home", new { surveyId = item.Id })">Results</a>
+
+                <input id="@("surveyUrl"+item.Id)" type="hidden" value="@(ViewBag.BaseUrl + "/Home/MainSurvey?surveyId=" + item.Id)" />
+                @*<a href="#" class="float-right" onclick="CopyUrl('@("surveyUrl"+item.Id)')">Copy Link</a>*@
+                <button style="padding:0rem !important"  onclick="CopyUrl('@("surveyUrl"+item.Id)')"  class="btn btn-link btn-sm float-right">Copy Link</button>
             </div>
         </div>
+    </div>
+    }
     }
 </div>
 
+
+@section Scripts {
+
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script type="text/javascript">
+        function CopyUrl(id) {
+            var copyText = document.getElementById(id).value;
+            console.log(copyText);
+            var textArea = document.createElement("textarea");
+            textArea.value = copyText;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand("Copy");
+            textArea.remove();
+            $('.toast').toast('show');
+        }
+    </script>
+}
 

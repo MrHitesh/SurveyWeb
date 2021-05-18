@@ -31,7 +31,10 @@ namespace SurveyWebApp.Controllers
         {
             //Seed.SeedData(_db, _httpContextAccessor);
             //ViewData.Model = _db.Surveys.Where(x => x.CreatedBy == User.Identity.Name).OrderByDescending(x=>x.CreatedOn);
+            var request = _httpContextAccessor.HttpContext.Request;
+            var domain = $"{request.Scheme}://{request.Host}";
 
+            ViewBag.BaseUrl = domain;
             ViewData.Model = _db.Surveys.Where(x => x.PublishedOn != null && x.ExpiresOn >= DateTime.Now).OrderByDescending(x => x.CreatedOn);
             return View();
         }
@@ -128,7 +131,7 @@ namespace SurveyWebApp.Controllers
 
             _db.SaveChanges();
 
-            return Edit(FormSurvey.Id);
+            return RedirectToAction("PreviewAndPublish", new { surveyId = FormSurvey.Id });
         }
 
         [HttpPost]
