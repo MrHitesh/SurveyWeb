@@ -134,6 +134,7 @@ namespace SurveyWebApp.Controllers
             {
                 surveyFromdb.Title = FormSurvey.Title;
                 surveyFromdb.Description = FormSurvey.Description;
+                surveyFromdb.ExpiresOn = FormSurvey.ExpiresOn;
 
                 foreach (Question que in FormSurvey.Questions)
                 {
@@ -177,6 +178,29 @@ namespace SurveyWebApp.Controllers
             _db.SaveChanges();
 
             return Ok(questionToDelete);
+        }
+
+        [HttpPost]
+        public IActionResult DeleteSurvey(int id)
+        {
+            var responsesToDelete = _db.Responses.Where(x => x.Survey.Id == id);
+            _db.Responses.RemoveRange(responsesToDelete);
+
+            var surveyToDelete = _db.Surveys
+                .Include(x => x.Questions)
+                .ThenInclude(y => y.Choices)
+                .Where(x => x.Id == id).FirstOrDefault();
+
+            foreach (var que in surveyToDelete.Questions)
+            {
+                _db.Choices.RemoveRange(que.Choices);
+                _db.Questions.Remove(que);
+            }
+
+            _db.Surveys.Remove(surveyToDelete);
+            _db.SaveChanges();
+
+            return Ok();
         }
         public IActionResult Results(int surveyId)
         {

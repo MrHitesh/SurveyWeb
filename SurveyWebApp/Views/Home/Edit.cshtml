@@ -22,72 +22,81 @@
 
 @if (Model != null)
 {
-    <div class="list-group mb-3 ">
-        <a href="@Url.Action("Edit", "Home", new { id = Model.Id })" class="list-group-item list-group-item-action gradient-custom">
+<div class="list-group">
+    <div href="@Url.Action("Edit", "Home", new { id = Model.Id })" class="list-group-item list-group-item-action gradient-custom">
 
-            <div class="d-flex w-100 justify-content-between">
-                <h5 class="mb-1">@Model?.Title</h5>
-                <small>Expires on @Model?.ExpiresOn</small>
-            </div>
-            <p class="mb-1">@Model?.Description</p>
-            <small>Created on @Model?.CreatedOn</small>
+        <div class="d-flex w-100 justify-content-between">
+            <h5 id="headerTitle" class="mb-1">@Model?.Title</h5>
+            <small id="headerExpiresOn">Expires on @Model?.ExpiresOn</small>
+        </div>
+        <p id="headerDescription" class="mb-1">@Model?.Description</p>
+        <small>Created on @Model?.CreatedOn</small>
+        <button type="button" onclick="EditSurvey()" class="btn btn-primary btn-sm float-right">Edit</button>
+        <button type="button" onclick="deleteSurvey()" class="btn btn-danger btn-sm float-right mr-2">Delete</button>
 
-        </a>
+
     </div>
+</div>
 }
 
 <div class="row">
     <div class="col">
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Id" />
-            @if (Model == null)
-            {
-                <div class="form-group">
-                    <label asp-for="Title" class="control-label"></label>
-                    <input id="surveyTitle" asp-for="Title" class="form-control" />
-                    <span asp-validation-for="Title" class="text-danger"></span>
-
-                </div>
-                <div class="form-group">
-                    <label asp-for="Description" class="control-label"></label>
-                    <input id="surveyDescription" asp-for="Description" class="form-control" />
-                    <span asp-validation-for="Description" class="text-danger"></span>
-                </div>
-
-                <input type="hidden" asp-for="CreatedOn" value="@DateTime.Now" />
-                <div class="form-group">
-                    <label asp-for="ExpiresOn" class="control-label"></label>
-                    <input id="surveyExpiresOn" asp-for="ExpiresOn" class="form-control" style="max-width:300px" />
-                    <span asp-validation-for="ExpiresOn" class="text-danger"></span>
-                </div>
-                <input type="hidden" asp-for="CreatedBy" value="@User.Identity.Name" />
-            }
-            else
-            {
-                <input id="surveyTitle" type="hidden" asp-for="Title" />
-                <input id="surveyDescription" type="hidden" asp-for="Description" />
-                <fieldset hidden>
+            <input id="surveyId" type="hidden" asp-for="Id" />
+            <div class="card mb-2" id="editSurvey" hidden>
+                <div class="card-body">
                     <div class="form-group">
-                        <label asp-for="CreatedOn" class="control-label"></label>
-                        <input asp-for="CreatedOn" class="form-control" />
-                        <span asp-validation-for="CreatedOn" class="text-danger"></span>
+                        <label asp-for="Title" class="control-label"></label>
+                        <input id="surveyTitle" asp-for="Title" class="form-control" />
+                        <span asp-validation-for="Title" class="text-danger"></span>
+
                     </div>
                     <div class="form-group">
-                        <label asp-for="ExpiresOn" class="control-label"></label>
-                        <input id="surveyExpiresOn" asp-for="ExpiresOn" class="form-control" />
-                        <span asp-validation-for="ExpiresOn" class="text-danger"></span>
+                        <label asp-for="Description" class="control-label"></label>
+                        <input id="surveyDescription" asp-for="Description" class="form-control" />
+                        <span asp-validation-for="Description" class="text-danger"></span>
                     </div>
-                    <div class="form-group">
-                        <label asp-for="CreatedBy" class="control-label"></label>
-                        <input asp-for="CreatedBy" class="form-control" />
-                        <span asp-validation-for="CreatedBy" class="text-danger"></span>
-                    </div>
-                </fieldset>
-            }
+
+                    <input type="hidden" asp-for="CreatedOn" value="@DateTime.Now" />
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label asp-for="ExpiresOn" class="control-label"></label>
+                                <input id="surveyExpiresOn" asp-for="ExpiresOn" class="form-control"  />
+                                <span asp-validation-for="ExpiresOn" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <a href="#" onclick="SurveyEditDone()" id="SaveSurveyDetails" class="btn btn-secondary float-right" style="margin-top:28px;" >Done</a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                    
 
 
-            <div class="card bg-light mb-3">
+
+                    <input type="hidden" asp-for="CreatedBy" value="@User.Identity.Name" />
+
+                    <fieldset hidden>
+                        <div class="form-group">
+                            <label asp-for="CreatedOn" class="control-label"></label>
+                            <input asp-for="CreatedOn" class="form-control" />
+                            <span asp-validation-for="CreatedOn" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="CreatedBy" class="control-label"></label>
+                            <input asp-for="CreatedBy" class="form-control" />
+                            <span asp-validation-for="CreatedBy" class="text-danger"></span>
+                        </div>
+                    </fieldset>
+                </div>
+                </div>
+
+
+            <div class="card bg-light mb-3 mt-2">
                 <h5 class="card-header">Add Question and Choices</h5>
                 <div class="card-body">
                     <div class="form-group">
@@ -132,32 +141,32 @@
             <div id="QuesCards">
                 @if (Model != null)
                 {
-                    @for (int i = 0; i < Model.Questions.Count(); i++)
+                @for (int i = 0; i < Model.Questions.Count(); i++)
                     {
-                        <div class="card mt-3 mb-3" id="@("q"+ Model.Questions[i].Id +"s" + Model.Id)" ;>
-                            <div class="card-header">
-                                <input type="hidden" asp-for="Questions[i].Id" />
-                                <input style="font-weight: bold;" asp-for="Questions[i].QuestionText" type="text" class="form-control">
-                            </div>
-                            <ul class="list-group list-group-flush">
-                                @for (int j = 0; j < Model.Questions[i].Choices.Count(); j++)
+                <div class="card mt-3 mb-3" id="@("q"+ Model.Questions[i].Id +"s" + Model.Id)" ;>
+                    <div class="card-header">
+                        <input type="hidden" asp-for="Questions[i].Id" />
+                        <input style="font-weight: bold;" asp-for="Questions[i].QuestionText" type="text" class="form-control">
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        @for (int j = 0; j < Model.Questions[i].Choices.Count(); j++)
                                 {
-                                    <li class="list-group-item">
-                                        <div class="input-group">
-                                            <div class="input-group-prepend">
-                                                <div class="input-group-text">
-                                                    <input type="radio" aria-label="Radio button for following text input" disabled>
-                                                </div>
-                                            </div>
-                                            <input type="hidden" asp-for="Questions[i].Choices[j].Id" />
-                                            <input asp-for="Questions[i].Choices[j].ChoiceText" type="text" class="form-control">
+                        <li class="list-group-item">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text">
+                                        <input type="radio" aria-label="Radio button for following text input" disabled>
+                                    </div>
+                                </div>
+                                <input type="hidden" asp-for="Questions[i].Choices[j].Id" />
+                                <input asp-for="Questions[i].Choices[j].ChoiceText" type="text" class="form-control">
 
-                                        </div>
-                                    </li>
+                            </div>
+                        </li>
                                 }
-                            </ul>
-                            <a onclick="deleteQuestion('@("q"+ Model.Questions[i].Id +"s" + Model.Id)','@Model.Questions[i].Id')" class="btn btn-danger">Delete</a>
-                        </div>
+                    </ul>
+                    <a onclick="deleteQuestion('@("q"+ Model.Questions[i].Id +"s" + Model.Id)','@Model.Questions[i].Id')" class="btn btn-danger">Delete</a>
+                </div>
                     }
                 }
             </div>
@@ -181,9 +190,31 @@
 @section Scripts {
 
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-    <script type="text/javascript">
+<script type="text/javascript">
     var choiceIndex = 2;
-    var modelCopy = '@Model';
+        var modelCopy = '@Model';
+
+        function EditSurvey() {
+
+                //element.setAttribute("style", "background-color: blue;");
+                document.getElementById("editSurvey").setAttribute("style", "display: block !important;");
+        }
+
+        function SurveyEditDone() {
+            var model = {
+                Id: $('#surveyId').val(),
+                Title: $('#surveyTitle').val(),
+                Description: $('#surveyDescription').val(),
+                ExpiresOn: $('#surveyExpiresOn').val(),
+                Questions: []
+            };
+
+            $.post("/Home/Create/", model, function (res) {
+                console.log(res);
+                window.location = '/Home/Edit?id=' + res.id;
+            });
+        }
+
     function deleteQuestion(elementid, Qid) {
 
         $("#overlay").css({ "visibility": "visible" });
@@ -192,7 +223,17 @@
             console.log("Delete Successfull");
             window.location.reload(true);
         });
-        }
+    }
+
+    function deleteSurvey() {
+
+        var surveyId = $('#surveyId').val();
+        $.post("/Home/DeleteSurvey", { id: surveyId }, function (res) {
+            console.log(res);
+            console.log("Delete Successfull");
+            window.location = '/Home/SurveyList'
+        });
+    }
 
     function AddQuesCard() {
 
@@ -223,18 +264,6 @@
             console.log(res);
             window.location = '/Home/Edit?id='+res.id;
         });
-            //$.ajax({
-            //    contentType: 'application/json; charset=utf-8',
-            //    type: 'POST',
-            //    url: '/Home/Create/',
-            //    data: dataObject,
-            //    success: function (response) {
-
-            //    },
-            //    failure: function (response) {
-
-            //    }
-            //});
 
     }
 
@@ -251,16 +280,13 @@
             </div> \
         </li>');
         choiceIndex = choiceIndex + 1;
-        //alert('Choice count :' + choiceCount);
+
     }
-    //$(document).ajaxStop(function () {
-    //    window.location.reload();
-    //});
 
         $(document).ready(function () {
             @*alert('@Model.Questions.Count()');*@
         });
-    </script>
+</script>
 }
 
 
