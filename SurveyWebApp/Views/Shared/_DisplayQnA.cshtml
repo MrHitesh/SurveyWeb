@@ -21,7 +21,7 @@
                         <li class="list-group-item">
 
                             <div class="custom-control custom-radio">
-                                <input type="radio" id="@("choice"+j+"ques"+i)" asp-for="Responses[i].Choice.Id" class="custom-control-input" value="@Model.Survey.Questions[i].Choices[j].Id" />
+                                <input required type="radio" id="@("choice"+j+"ques"+i)" asp-for="Responses[i].Choice.Id" class="custom-control-input" value="@Model.Survey.Questions[i].Choices[j].Id" />
                                 <label class="custom-control-label" for="@("choice"+j+"ques"+i)">@Model.Survey.Questions[i].Choices[j].ChoiceText</label>
                             </div>
                         </li>

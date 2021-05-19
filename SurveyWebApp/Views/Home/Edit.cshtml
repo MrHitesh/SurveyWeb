@@ -22,11 +22,17 @@
 
 @if (Model != null)
 {
-    <div class="card gradient-custom mb-3">
-        <div class="card-body">
-            <h4>@Model?.Title</h4>
-            <h6>@Model?.Description</h6>
-        </div>
+    <div class="list-group mb-3 ">
+        <a href="@Url.Action("Edit", "Home", new { id = Model.Id })" class="list-group-item list-group-item-action gradient-custom">
+
+            <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-1">@Model?.Title</h5>
+                <small>Expires on @Model?.ExpiresOn</small>
+            </div>
+            <p class="mb-1">@Model?.Description</p>
+            <small>Created on @Model?.CreatedOn</small>
+
+        </a>
     </div>
 }
 
@@ -52,7 +58,7 @@
                 <input type="hidden" asp-for="CreatedOn" value="@DateTime.Now" />
                 <div class="form-group">
                     <label asp-for="ExpiresOn" class="control-label"></label>
-                    <input id="surveyExpiresOn" asp-for="ExpiresOn" class="form-control" />
+                    <input id="surveyExpiresOn" asp-for="ExpiresOn" class="form-control" style="max-width:300px" />
                     <span asp-validation-for="ExpiresOn" class="text-danger"></span>
                 </div>
                 <input type="hidden" asp-for="CreatedBy" value="@User.Identity.Name" />

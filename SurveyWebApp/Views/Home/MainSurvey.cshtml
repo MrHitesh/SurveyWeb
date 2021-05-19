@@ -31,7 +31,7 @@
             @{ Layout = null; }
             @if (Model != null)
             {
-                <form asp-action="MainSurvey">
+                <form asp-action="MainSurvey" class="">
                     <div class="card gradient-custom mb-3">
                         <div class="card-body">
                             <h4>@Model?.Survey?.Title</h4>
@@ -41,10 +41,13 @@
                     <div class="row">
                         <div class="col">
                             <div class="input-group" style="max-width:300px">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text" id="EmployeeId">Employee Id</span>
+                                <div  class="input-group-prepend">
+                                    <span  class="input-group-text" id="EmployeeId">Employee Id</span>
                                 </div>
-                                <input type="text" asp-for="EmployeeId" class="form-control" placeholder="Enter Employee Id" aria-label="Username">
+                                <input required id="validationCustomUsername" type="text" asp-for="EmployeeId" class="form-control" placeholder="Enter Employee Id" aria-label="Username">
+                                <div class="invalid-feedback">
+                                    Please Enter Employee Id.
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -52,7 +55,7 @@
                         <div class="col">
                             @await Html.PartialAsync("_DisplayQnA", Model)
                             <div class="form-group mt-3 mb-3 float-right">
-                                <input onclick="Save()" type="submit" value="Submit" class="btn btn-primary" />
+                                <input type="submit" value="Submit" class="btn btn-primary" />
                             </div>
                         </div>
                     </div>
@@ -71,6 +74,26 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <script type="text/javascript">
+        (function () {
+            'use strict';
+            window.addEventListener('load', function () {
+                // Fetch all the forms we want to apply custom Bootstrap validation styles to
+                var forms = document.getElementsByClassName('needs-validation');
+                // Loop over them and prevent submission
+                var validation = Array.prototype.filter.call(forms, function (form) {
+                    form.addEventListener('submit', function (event) {
+                        if (form.checkValidity() === false) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
+                        form.classList.add('was-validated');
+                    }, false);
+                });
+            }, false);
+        })();
+    </script>
 
 </body>
 </html>
