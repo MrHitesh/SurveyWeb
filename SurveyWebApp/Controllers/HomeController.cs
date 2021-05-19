@@ -34,8 +34,26 @@ namespace SurveyWebApp.Controllers
             var request = _httpContextAccessor.HttpContext.Request;
             var domain = $"{request.Scheme}://{request.Host}";
 
+            DashboardViewModel vm = new DashboardViewModel();
+
             ViewBag.BaseUrl = domain;
-            ViewData.Model = _db.Surveys.Where(x => x.PublishedOn != null && x.ExpiresOn >= DateTime.Now).OrderByDescending(x => x.CreatedOn);
+            var activeSurveys = _db.Surveys.Where(x => x.PublishedOn != null && x.ExpiresOn >= DateTime.Now).OrderByDescending(x => x.CreatedOn);
+
+            var responses = _db.Responses
+                .Include(x=>x.Survey)
+                .Where(x => activeSurveys.Contains(x.Survey)).ToList();
+
+            foreach (var s in activeSurveys)
+            {
+                var responseCount = responses.Where(x => x.Survey.Id == s.Id).Select(x => x.EmployeeId).Distinct().Count();
+                vm.SurveyDetails.Add(new SurveyDetails()
+                {
+                    Survey = s,
+                    ResponseCount = responseCount
+                });
+            }
+
+            ViewData.Model = vm;
             return View();
         }
 
@@ -271,6 +289,13 @@ namespace SurveyWebApp.Controllers
         [HttpPost]
         public IActionResult MainSurvey(ResponseViewModel responseViewModel)
         {
+
+            var existing = _db.Responses.Where(x => x.EmployeeId == responseViewModel.EmployeeId && x.Survey.Id == responseViewModel.Survey.Id).ToList();
+            if (existing.Count > 0)
+            {
+                _db.RemoveRange(existing);
+            }
+
             foreach (var response in responseViewModel.Responses)
             {
                 response.Choice = _db.Choices.Find(response.Choice.Id);
