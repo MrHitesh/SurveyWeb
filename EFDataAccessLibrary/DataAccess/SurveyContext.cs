@@ -1,4 +1,5 @@
 ﻿using EFDataAccessLibrary.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace EFDataAccessLibrary.DataAccess
 {
-    public class SurveyContext : DbContext
+    public class SurveyContext : IdentityDbContext
     {
         public SurveyContext(DbContextOptions options) : base(options)
         {

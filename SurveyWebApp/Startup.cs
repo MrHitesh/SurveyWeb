@@ -1,6 +1,7 @@
 using EFDataAccessLibrary.DataAccess;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -28,6 +29,10 @@ namespace SurveyWebApp
             {
                 options.UseSqlServer(Configuration.GetConnectionString("Default"));
             });
+
+            services.AddIdentity<IdentityUser, IdentityRole>()
+                .AddEntityFrameworkStores<SurveyContext>();
+
             services.AddControllersWithViews().AddRazorRuntimeCompilation();
             services.AddHttpContextAccessor();
         }
@@ -44,6 +49,7 @@ namespace SurveyWebApp
                 app.UseExceptionHandler("/Home/Error");
             }
             app.UseStaticFiles();
+            app.UseAuthentication();
 
             app.UseRouting();
 
@@ -53,7 +59,7 @@ namespace SurveyWebApp
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                    pattern: "{controller=Account}/{action=Register}/{id?}");
             });
         }
     }
