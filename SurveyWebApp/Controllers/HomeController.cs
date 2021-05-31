@@ -1,6 +1,7 @@
 ﻿using EFDataAccessLibrary;
 using EFDataAccessLibrary.DataAccess;
 using EFDataAccessLibrary.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -27,6 +28,7 @@ namespace SurveyWebApp.Controllers
             this._httpContextAccessor = httpContextAccessor;
         }
 
+        [Authorize]
         public IActionResult Index()
         {
             //Seed.SeedData(_db, _httpContextAccessor);
